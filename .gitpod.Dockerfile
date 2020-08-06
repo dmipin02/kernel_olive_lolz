@@ -7,7 +7,6 @@ RUN sudo apt-get update \
 	curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev \
 	x11proto-core-dev libx11-dev libssl-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils \
 	xsltproc unzip python bc liblz4-tool vboot-utils vim u-boot-tools \
-	device-tree-compiler wget zsh tmux \
-    && rm -rf /var/lib/apt/lists/*
+	device-tree-compiler wget zsh tmux
 
 # Apply user-specific settings
