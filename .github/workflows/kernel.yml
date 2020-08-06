@@ -1,0 +1,45 @@
+name: Build kernel
+
+on: 
+  release:
+    types: [published]
+  push:
+    branches: 
+      - V10
+
+jobs:
+  build: 
+    runs-on: ubuntu-16.04
+    
+    env:
+      ARCH: arm64
+      KBUILD_BUILD_HOST: 4pda
+      KBUILD_BUILD_USER: dmipin02
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Freeze Actions timeout
+        run: touch /tmp/keepalive
+
+      - name: Install packages
+        run: |
+          sudo apt-get update -qyy
+          sudo apt-get install wget curl bc make git build-essential libssl-dev libglib2.0-dev curl flex g++-multilib gcc-multilib gnupg gperf lib32ncurses5-dev lib32z1-dev libesd0-dev libncurses5-dev libsdl1.2-dev libwxgtk-media3.0-dev libxml2 libxml2-utils lzop pngcrush schedtool squashfs-tools xsltproc zip zlib1g-dev
+      
+      - name: Download toolchain
+        run: |
+          git clone https://github.com/Jprimero15/lolz_clang --depth=1 toolchain
+          
+      - name: Prepare build
+        run: make O=out ARCH=arm64 lolz_olive_defconfig
+
+      - name: Build kernel
+        run: make -j32 O=out ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+      
+     # - name: Build modules
+     #   run: make modules -j24
+      
+      - name: SSH for debug
+        uses: P3TERX/debugger-action@master
+
