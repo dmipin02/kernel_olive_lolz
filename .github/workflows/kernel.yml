@@ -29,17 +29,22 @@ jobs:
       
       - name: Download toolchain
         run: |
-          git clone https://github.com/Jprimero15/lolz_clang --depth=1 toolchain
-          
+          git clone https://github.com/Jprimero15/lolz_clang --depth=1 clang
+          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 -b android-10.0.0_r4 --depth=1 gcc64
+          git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 -b android-10.0.0_r41 --depth=1 gcc32
+          export PATH=$PATH:$PWD/clang/bin:$PWD/gcc64/bin:$PWD/gcc32/bin
+
       - name: Prepare build
-        run: make O=out ARCH=arm64 lolz_olive_defconfig
+        run: make O=out ARCH=arm64 kali_olive_defconfig
 
       - name: Build kernel
-        run: make -j32 O=out ARCH=arm64 CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-      
-     # - name: Build modules
-     #   run: make modules -j24
-      
-      - name: SSH for debug
-        uses: P3TERX/debugger-action@master
+        run: make -j32 O=out ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-androidkernel- CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: out/Image.gz
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: out/Image.gz-dtb
 
